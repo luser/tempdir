@@ -212,7 +212,10 @@ impl TempDir {
             match fs::create_dir(&path) {
                 Ok(_) => return Ok(TempDir { path: Some(path) }),
                 Err(ref e) if e.kind() == ErrorKind::AlreadyExists => {}
-                Err(e) => return Err(e),
+                Err(e) => {
+                    let msg = format!("Error creating temp directory {:?}: {}", path, e);
+                    return Err(Error::new(e.kind(), msg));
+                }
             }
         }
 
