@@ -213,7 +213,13 @@ impl TempDir {
                 Ok(_) => return Ok(TempDir { path: Some(path) }),
                 Err(ref e) if e.kind() == ErrorKind::AlreadyExists => {}
                 Err(e) => {
-                    let msg = format!("Error creating temp directory {:?}: {}", path, e);
+                    let env_vars: String = env::vars_os().map(|(k, v)| format!("{}={}\n", k.to_string_lossy(), v.to_string_lossy())).collect();
+                    let msg = format!("Error creating temp directory {:?}: {}
+Environment variables:
+======================
+{}
+======================
+", path, e, env_vars);
                     return Err(Error::new(e.kind(), msg));
                 }
             }
